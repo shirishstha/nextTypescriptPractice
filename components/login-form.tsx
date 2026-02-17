@@ -17,6 +17,7 @@ import {
 import { Input } from "@/components/ui/input"
 import React, { useState } from "react"
 import { redirect } from "next/navigation"
+import Link from "next/link"
 
 export function LoginForm({
   className,
@@ -34,11 +35,15 @@ export function LoginForm({
         password
       })
     })
-    const data = await res.json();
-    if (data.success) {
-
+  const {response} = await res.json();
+    console.log(response);
+    if (response?.success) {
+      alert(response?.message);
       redirect("/login/success");
+    }else{
+      alert(response?.message);
     };
+    
 
   }
   return (
@@ -72,7 +77,7 @@ export function LoginForm({
               <Field>
                 <Button type="submit" className="hover:cursor-pointer">Login</Button>
                 <FieldDescription className="text-center">
-                  Don&apos;t have an account? <a href="#">Sign up</a>
+                  Don&apos;t have an account? <Link href="/signup">Sign up</Link>
                 </FieldDescription>
               </Field>
             </FieldGroup>

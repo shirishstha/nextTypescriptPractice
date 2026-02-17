@@ -1,12 +1,11 @@
 import { cookies } from "next/headers";
-import { NextRequest, NextResponse } from "next/server";
-import jwt, { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
-import { prisma } from "./lib/prismaHelper";
+import { NextResponse } from "next/server";
+import jwt, { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken"
+import { prisma } from "@/lib/prismaHelper";
 
-export default async function auth(request: NextRequest) {
-    const pathname = request.nextUrl.pathname;
-    const protectedPath = ["/about", "/products", "/login/success", "/admin"];
-    if (protectedPath.some(path => pathname.startsWith(path))) {
+export const adminWithSessionCheck = async (pathname: string) => {
+    const adminPath = ["/api/admin", "/admin", "/api/product"]
+    if (adminPath.some(path => pathname.startsWith(path))) {
         const cookieStore = await cookies();
         const token = cookieStore.get("token")?.value;
         // checking if there is a session id
@@ -14,18 +13,17 @@ export default async function auth(request: NextRequest) {
             return NextResponse.json({
                 success: false,
                 message: "No session found or invalid session"
-            })
+            }, { status: 401 })
         }
-
         //decoding the session id with jwt
-        const secret = process.env.JWTKEY;
-        if (!secret) {
-            return NextResponse.json({
-                success: false,
-                message: "Cannot find the secret"
-            })
-        }
         try {
+            const secret = process.env.JWTKEY;
+            if (!secret) {
+                return NextResponse.json({
+                    success: false,
+                    message: "Cannot find the secret"
+                })
+            }
             const verifiedToken = jwt.verify(token, secret);
 
             if (!verifiedToken || typeof verifiedToken === "string") {
@@ -50,6 +48,24 @@ export default async function auth(request: NextRequest) {
                     message: "Session Expired"
                 })
             }
+
+
+            //admin validation
+            const uid = dbSession.userId;
+            const user = await prisma.user.findUnique({
+                where: {
+                    id: uid
+                }
+            });
+            const isAdmin = user?.isAdmin;
+            if (!isAdmin) {
+                return NextResponse.json({
+                    success: false,
+                    message: "Only admin can access this route"
+                }, { status: 401 })
+            }
+            return null
+
         } catch (error) {
             if (error instanceof JsonWebTokenError) {
                 return NextResponse.json({
@@ -64,13 +80,6 @@ export default async function auth(request: NextRequest) {
                 })
             }
         }
-        return NextResponse.next()
     }
-}
 
-export const config = {
-    matcher: [
-        "/((?!.+\\.[\\w]+$|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|images).*)",
-    ],
-    runtime: "nodejs",
-};
+}
