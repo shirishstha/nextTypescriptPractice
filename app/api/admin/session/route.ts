@@ -1,13 +1,11 @@
 import { prisma } from "@/lib/prismaHelper";
 import { ObjectId } from "bson";
-import jwt, { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
-import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-import { adminWithSessionCheck } from "../adminWIthSessionCheck";
+import { checkPermission } from "../../checkPermission";
+import { Role } from "@prisma/client";
 
 export const GET = async (request: NextRequest) => {
-    const pathname = request.nextUrl.pathname;
-    const valid = await adminWithSessionCheck(pathname);
+    const valid = await checkPermission(Role.ADMIN, "GET_SESSION");
 
     //if the validation fails
     if (valid !== null) {
@@ -60,8 +58,7 @@ export const GET = async (request: NextRequest) => {
 }
 
 export const DELETE = async (request: NextRequest) => {
-    const pathname = request.nextUrl.pathname;
-    const valid = await adminWithSessionCheck(pathname);
+    const valid = await checkPermission(Role.ADMIN, "DELETE_SESSION");
 
     //if the validation fails
     if (valid !== null) {
@@ -86,7 +83,8 @@ export const DELETE = async (request: NextRequest) => {
 
     return NextResponse.json({
         success: true,
-        message: "Session deleted successfully"
+        message: "Session deleted successfully",
+        data: result
     })
 }
 

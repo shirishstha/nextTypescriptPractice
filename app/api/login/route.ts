@@ -54,33 +54,16 @@ export const POST = async (request: NextRequest) => {
         message: "Cannot find the secret",
     }, { status: 403 })
 
-    const token = jwt.sign({ sid }, secret, { expiresIn: "1h" })
+    const token = jwt.sign({ sid }, secret, { expiresIn: "1h" });
+    const uid = user.id;
+    const role = user.role;
+    const name = user.name;
+    const signedUser = jwt.sign({ uid, role, name, email }, secret, { expiresIn: "1h" })
 
     //setting up the cookie 
     await setSession(token, userSession.expiresAt);
-    await setUser({
-        id: user?.id,
-        email: user.email,
-        name: user.name,
-        isAdmin: user.isAdmin
-    })
+    await setUser(signedUser, userSession.expiresAt);
 
-
-    return successResponse({},"Login success",201);
-
-
-    //code for jwt asigning in cookie
-
-    // const jwtKey = process.env.JWTKEY || "";
-    // const token = jwt.sign({ email }, jwtKey, { expiresIn: '1h' })
-    // cookieStore.set("token", token, {
-    //     maxAge: 60 * 60 * 24
-    // })
-    // const user = {
-    //     id: "100",
-    //     email: email
-    // }
-    // setSession(user);
-
+    return successResponse({}, "Login success", 200);
 
 }

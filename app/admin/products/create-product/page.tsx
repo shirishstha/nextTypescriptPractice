@@ -28,12 +28,10 @@ export default function createProduct() {
             const { response } = await res.json();
             if (!response.success) {
                 toast.error("Error Occured", {
-                    position: "top-center",
                     description: response.message
                 });
             } else {
                 toast.success("Product Created", {
-                    position: "top-center",
                     description: response.message
                 });
             }

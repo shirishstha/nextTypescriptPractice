@@ -11,25 +11,26 @@ import {
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { useEffect, useState } from "react"
+import { toast } from "sonner"
 export default function Home() {
     const [userId, setUserId] = useState("");
     const [sessions, setSessions] = useState([]);
     async function getSession() {
-        const res = await fetch(`/api/admin?uid=${userId}`, {
+        const res = await fetch(`/api/admin/session?uid=${userId}`, {
             method: "GET",
         })
 
         const data = await res.json();
         if (!data.success) {
             console.log("failed to load sessions");
-            alert(data.message);
+            toast.error(data.message);
             return
         }
         setSessions(data.user?.sessions);
 
     }
     async function deleteSession(sid: string) {
-        const res = await fetch(`/api/admin/?sid=${sid}`, {
+        const res = await fetch(`/api/admin/session?sid=${sid}`, {
             method: "DELETE",
         })
 
@@ -37,7 +38,7 @@ export default function Home() {
         if (!data.success) {
             return console.log("failed to delete sessions");
         }
-        alert(data.message);
+        toast(data.message);
         getSession();
 
     }
@@ -49,7 +50,7 @@ export default function Home() {
     }
     return (
         <div className="m-5">
-            <h1 className="font-normal text-3xl p-5">Admin page</h1>
+            <h1 className="font-normal text-3xl py-5">Manage Sessions</h1>
             <h2>Enter User Id for fetching sessions</h2>
             <div className="w-xl flex space-x-2">
 

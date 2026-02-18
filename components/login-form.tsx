@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input"
 import React, { useState } from "react"
 import { redirect } from "next/navigation"
 import Link from "next/link"
+import { toast } from "sonner"
 
 export function LoginForm({
   className,
@@ -35,13 +36,15 @@ export function LoginForm({
         password
       })
     })
-  const {response} = await res.json();
-    console.log(response);
+
+    const {response} = await res.json();
+    console.log(response.success);
+ 
     if (response?.success) {
-      alert(response?.message);
+      toast.success(response.message);
       redirect("/login/success");
     }else{
-      alert(response?.message);
+      toast.error(response.message);
     };
     
 

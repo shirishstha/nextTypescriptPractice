@@ -1,6 +1,4 @@
 import { cookies } from "next/headers"
-import { BlockquoteHTMLAttributes } from "react";
-
 
 //set cookies for session
 export const setSession = async (token: string, expiresAt: Date) => {
@@ -16,7 +14,7 @@ export const getSession = async () => {
     const cookieStore = await cookies();
     const data = cookieStore.get("token")?.value;
     if (!data) return null;
-    return JSON.parse(data);
+    return data;
 }
 
 //delete cookies for session
@@ -30,17 +28,12 @@ export const deleteSession = async () => {
 
 }
 
-type User = {
-    id: string,
-    name: string,
-    email: string,
-    isAdmin: boolean
-}
 //set cookies for users
-export const setUser = async (user:User) => {
+export const setUser = async (user:string, expiresAt: Date) => {
     const cookieStore = await cookies();
-    cookieStore.set("user", JSON.stringify(user), {
-        httpOnly: false,
+      cookieStore.set("user", JSON.stringify(user), {
+        httpOnly: true,
+        expires: expiresAt
     });
 }
 //delete cookies for users

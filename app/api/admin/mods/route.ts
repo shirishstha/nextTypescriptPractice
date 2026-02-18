@@ -1,19 +1,14 @@
-import { NextRequest, NextResponse } from "next/server"
+import { NextRequest } from "next/server"
 import { errorResponse, successResponse } from "../../responseHandler";
+import { adminWithSessionCheck } from "../../adminWIthSessionCheck";
 import { prisma } from "@/lib/prismaHelper";
 import isValidObjectId from "@/lib/validateObjectId";
-import { getProduct } from "../../getProduct";
-import { checkPermission } from "../../checkPermission";
-import { Role } from "@prisma/client";
-import { getCurrentUser } from "@/lib/getCurrentUser";
 
 // To create a product
 export const POST = async (request: NextRequest) => {
-    const user = await getCurrentUser();
-    if (!user || user == null || user instanceof NextResponse) {
-        return user
-    }
-    const valid = await checkPermission(user.role, "CREATE_PRODUCT");
+    const pathname = request.nextUrl.pathname;
+    const valid = await adminWithSessionCheck(pathname);
+
     //if the validation fails
     if (valid !== null) {
         return valid
@@ -44,11 +39,8 @@ export const POST = async (request: NextRequest) => {
 
 // To update a product
 export const PUT = async (request: NextRequest) => {
-    const user = await getCurrentUser();
-    if (!user || user == null || user instanceof NextResponse) {
-        return user
-    }
-    const valid = await checkPermission(user.role, "UPDATE_PRODUCT");
+    const pathname = request.nextUrl.pathname;
+    const valid = await adminWithSessionCheck(pathname);
 
     //if the validation fails
     if (valid !== null) {
@@ -103,11 +95,8 @@ export const PUT = async (request: NextRequest) => {
 
 // To delete a product
 export const DELETE = async (request: NextRequest) => {
-    const user = await getCurrentUser();
-    if (!user || user == null || user instanceof NextResponse) {
-        return user
-    }
-    const valid = await checkPermission(user.role, "DELETE_PRODUCT");
+    const pathname = request.nextUrl.pathname;
+    const valid = await adminWithSessionCheck(pathname);
 
     //if the validation fails
     if (valid !== null) {
@@ -141,20 +130,10 @@ export const DELETE = async (request: NextRequest) => {
         return errorResponse("Operation failed", 500)
     }
 
-    return successResponse(result, "Product deleted successfully", 200);
+    return successResponse( result , "Product deleted successfully", 200);
 }
 
 export const GET = async (request: NextRequest) => {
-    const user = await getCurrentUser();
-    if (!user || user == null || user instanceof NextResponse) {
-        return user
-    }
-    const valid = await checkPermission(user.role, "GET_PRODUCT");
-    //if the validation fails
-    if (valid !== null) {
-        return valid
-    }
-
     const id = request.nextUrl.searchParams.get("id");
 
     // validate id

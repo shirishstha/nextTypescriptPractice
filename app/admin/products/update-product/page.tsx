@@ -56,12 +56,10 @@ export default function manageProduct() {
             const { response } = await res.json();
             if (!response.success) {
                 toast.error("Error Occured", {
-                    position: "top-center",
                     description: response.message
                 });
             } else {
-                toast.success("Product Updated", {
-                    position: "top-center",
+                toast.success("Product Updated", {                   
                     description: response.message
                 });
             }

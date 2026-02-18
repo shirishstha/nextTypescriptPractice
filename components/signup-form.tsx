@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input"
 import Link from "next/link"
 import { redirect } from "next/navigation"
 import { useState } from "react"
+import { toast } from "sonner"
 
 export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
 
@@ -35,8 +36,8 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
       })
     })
     const data = await res.json();
-    alert("Signup Successfull");
-    if(data?.success){
+    toast("Signup Successfull");
+    if (data?.success) {
       redirect("/login");
     }
   }
@@ -49,7 +50,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={(e)=> handleSubmit(e)}>
+        <form onSubmit={(e) => handleSubmit(e)}>
           <FieldGroup>
             <Field>
               <FieldLabel htmlFor="name">Full Name</FieldLabel>

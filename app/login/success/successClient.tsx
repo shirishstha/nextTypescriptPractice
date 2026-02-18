@@ -12,12 +12,13 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
+import { Role } from "@prisma/client";
 
 type User = {
     id: string
     name: string,
     email: string,
-    isAdmin: boolean
+    role: Role
 }
 
 type SuccessClientProps = {
@@ -78,7 +79,7 @@ export default function SuccessClient({ user }: SuccessClientProps) {
                     <Button onClick={(e) => logOut(e)} className=" border border-red-400 bg-transparent text-red-400 hover:cursor-pointer hover:bg-red-500 hover:text-white" >Logout</Button>
                 </div>
             </nav>
-            <main className="flex p-4 flex-wrap">
+            <main className="flex p-4 flex-wrap space-y-2">
                 {products && products.map((product: product) => {
                     return (
                         <Card className="relative mx-auto w-full max-w-sm pt-0 hover:scale-102 transition-all ease-in-out" key={product.id}>
