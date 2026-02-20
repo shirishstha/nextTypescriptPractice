@@ -53,12 +53,12 @@ export default function permission() {
   }
 
 
-    const getPermissionsWithRole = async () => {
+  const getPermissionsWithRole = async () => {
     //fetch all permission with role
     const res = await fetch("/api/admin/permission/getAllPermissionWithRole", {
       method: "GET"
     })
-  
+
     const { response } = await res.json();
     if (!response?.success) {
       return toast.error(response?.message)
@@ -114,8 +114,27 @@ export default function permission() {
     toast.success(response?.message);
     getPermissionsWithRole();
   }
+
+
+  //delete permissions
+  const deletePermission = async (e: any, id: string) => {
+    e.preventDefault();
+    const res = await fetch("/api/admin/permission/deletePermission", {
+      method: "DELETE",
+      body: JSON.stringify({
+        rolePermissionId: id,
+      })
+    })
+
+    const { response } = await res.json();
+    if (!response?.success) {
+      return toast.error(response.message);
+    }
+    toast.success(response?.message);
+    getPermissionsWithRole();
+  }
   return (
-    <div className="  grid grid-cols-3 gap-x-30 m-5">
+    <div className="  grid grid-cols-3 gap-x-7 m-5">
       <div className="col-span-2 gap-y-3">
 
         <div>
@@ -186,23 +205,24 @@ export default function permission() {
       </div>
 
       <div className="col-span-1 shadow-lg rounded-lg  p-5">
-                       <Table>
-      <TableCaption>A list of permission assigned to a role.</TableCaption>
-      <TableHeader>
-        <TableRow>
-          <TableHead className="w-[100px]">Role</TableHead>
-          <TableHead>Permission</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {permissionsWithRole.map((rolePermission:{id: string, role: string, permission:{name:string}}) => (
-          <TableRow key={rolePermission.id}>
-            <TableCell className="font-medium">{rolePermission.role}</TableCell>
-            <TableCell>{rolePermission.permission.name}</TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+        <Table>
+          <TableCaption>A list of permission assigned to a role.</TableCaption>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[100px]">Role</TableHead>
+              <TableHead>Permission</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {permissionsWithRole.map((rolePermission: { id: string, role: string, permission: { name: string } }) => (
+              <TableRow key={rolePermission.id}>
+                <TableCell className="font-medium">{rolePermission.role}</TableCell>
+                <TableCell>{rolePermission.permission.name}</TableCell>
+                <TableCell><Button onClick={(e) => deletePermission(e, rolePermission.id)}>Delete</Button></TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       </div>
     </div>
   )
